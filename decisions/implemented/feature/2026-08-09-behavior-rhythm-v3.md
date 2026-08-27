@@ -43,4 +43,5 @@ Status: implemented
 - 回合完成（含当前会话）：宠物播 celebrate 庆祝动画 4s，非当前会话附带气泡提示。
 - 调度决策可单测：`nextWorkingRhythm`/`detectRoundCompleted`/`shouldWake` 均有确定性测试（注入 now/随机源），修复「调度不可测」根因。
 - 测试更新：旧时间片用例（#15/#16/#22）改为 workingActive/celebrateUntil 语义；working 不再由 activity.working 驱动（#2/#4/#8 相应更新）。
+- 节奏器执行守卫（待触发决策不被 refresh 轮询重排——否则 working 永不激活）见 [bug-fix/2026-08-20-working-rhythm-timer-reset.md](../bug-fix/2026-08-20-working-rhythm-timer-reset.md)。
 - 已知边界：walk 的「burst 期间仍移动位置」（rAF step 不查 activity）与瞬发/窗口复位的统一所有权，属后续调度收敛（Step 2+），本决策未动。
