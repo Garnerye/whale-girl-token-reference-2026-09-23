@@ -12,8 +12,8 @@
 <p align="center">
   <img src="https://badgen.net/badge/license/MIT/green" alt="license" />
   <img src="https://badgen.net/badge/format/official%20bundle/8257D0" alt="official bundle" />
-  [![dshfind](https://dshfind.com/api/badge/vlln/whale-girl)](https://dshfind.com/en/plugins/vlln/whale-girl?ref=badge)
-  [![dsh.so security](https://www.dsh.so/badge/whale-girl.svg)](https://www.dsh.so/artifact/whale-girl)
+  <a href="https://dshfind.com/en/plugins/vlln/whale-girl?ref=badge"><img src="https://dshfind.com/api/badge/vlln/whale-girl" alt="dshfind" /></a>
+  <a href="https://www.dsh.so/artifact/whale-girl"><img src="https://www.dsh.so/badge/whale-girl.svg" alt="dsh.so security" /></a>
 </p>
 
 ---
