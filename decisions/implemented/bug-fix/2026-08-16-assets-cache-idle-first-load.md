@@ -29,4 +29,5 @@ Status: implemented
 
 - 暖刷新（缓存命中）：16 个素材请求零传输，PNG 总耗时 −95%；冷加载 PNG 总耗时 −52%。
 - 发布侧新增硬约束「改图必改文件名或角色 id」——违反则用户端滞留旧图直至缓存过期（365 天）。
+- manifest 例外：manifest 是可变索引（帧时序/角色 meta），client 以 `no-store` 每次页面加载重新拉取——见 [bug-fix/2026-08-20-manifest-cache-no-store.md](../bug-fix/2026-08-20-manifest-cache-no-store.md)。
 - 引用点：`lib/index.mjs`（assets 路由缓存头）、`lib/client/index.mjs`（loadAssets idle 优先）、`docs/adding-a-character.md`（改图约束）。
