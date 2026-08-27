@@ -33,3 +33,4 @@ Status: implemented
 - `loop` 字段从 manifest/门禁/文档移除（历史决策记录的 loop 描述为当时快照，不追溯改写）。
 - 测试：verify-assets 自证新增 playback 枚举/帧数下限用例；client-logic 新增 PLAYBACK_MODES 完整性用例。
 - 帧 0 可见性时序（进入状态时首帧至少展示一个帧间隔，`lastFrameAt` 取帧 0 应用时刻）见 [bug-fix/2026-08-20-state-entry-skip-first-frame.md](../bug-fix/2026-08-20-state-entry-skip-first-frame.md)——原实现进入状态同 tick 跳过帧 0，与「帧0=起点」契约相悖。
+- 逐帧停留时长（`frameMs`，可选，缺省回退 `1000/fps` 统一节拍）见 [feature/2026-08-20-per-frame-durations.md](../feature/2026-08-20-per-frame-durations.md)——非均匀节奏（首帧稍长/后续稍短）由 manifest 数据表达。

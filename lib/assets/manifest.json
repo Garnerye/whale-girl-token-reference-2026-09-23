@@ -79,7 +79,11 @@
           "sheet": "wake.png",
           "frames": 2,
           "fps": 3,
-          "playback": "once"
+          "playback": "once",
+          "frameMs": [
+            1000,
+            200
+          ]
         },
         "welcome": {
           "sheet": "welcome.png",

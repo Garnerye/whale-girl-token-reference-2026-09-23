@@ -90,6 +90,32 @@ test('拒绝：frames 非法', () => {
   assert.match(errors.join('\n'), /frames 必须是正整数/)
 })
 
+test('接受：frameMs 正数数组且长度 === frames（逐帧停留时长）', () => {
+  const good = fullStates({ idle: { sheet: 'idle.png', frames: 2, fps: 4, playback: 'loop', frameMs: [450, 250] } })
+  const root = makeTree({ 'lib/assets/manifest.json': good })
+  writeSheets(root, 'lib/assets')
+  const { ok, errors } = check(root)
+  assert.equal(ok, true, errors.join('\n'))
+})
+
+test('拒绝：frameMs 长度 !== frames', () => {
+  const bad = fullStates({ idle: { sheet: 'idle.png', frames: 2, fps: 4, playback: 'loop', frameMs: [450] } })
+  const root = makeTree({ 'lib/assets/manifest.json': bad })
+  writeSheets(root, 'lib/assets')
+  const { ok, errors } = check(root)
+  assert.equal(ok, false)
+  assert.match(errors.join('\n'), /frameMs 必须是正数数组且长度 === frames/)
+})
+
+test('拒绝：frameMs 含非正数/非数', () => {
+  const bad = fullStates({ idle: { sheet: 'idle.png', frames: 2, fps: 4, playback: 'loop', frameMs: [450, 0] } })
+  const root = makeTree({ 'lib/assets/manifest.json': bad })
+  writeSheets(root, 'lib/assets')
+  const { ok, errors } = check(root)
+  assert.equal(ok, false)
+  assert.match(errors.join('\n'), /frameMs 必须是正数数组且长度 === frames/)
+})
+
 test('拒绝：sheet 扩展名不在 MIME 白名单', () => {
   const bad = fullStates({ idle: { sheet: 'idle.txt', frames: 2, fps: 4, playback: 'loop' } })
   const root = makeTree({ 'lib/assets/manifest.json': bad })

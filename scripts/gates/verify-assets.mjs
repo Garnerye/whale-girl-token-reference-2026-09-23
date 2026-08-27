@@ -66,6 +66,14 @@ function checkStates(states, roleId, errors, root) {
     }
     if (!Number.isInteger(cfg.frames) || cfg.frames < 1) errors.push(`${label}.${name}: frames 必须是正整数`)
     if (typeof cfg.fps !== 'number' || cfg.fps <= 0) errors.push(`${label}.${name}: fps 必须是正数`)
+    // 逐帧停留时长（frameMs，可选）：正数数组、长度 === frames——帧 i 停留 frameMs[i] ms，
+    // 缺省回退统一 fps 节拍（首帧稍长/后续稍短的缓动由 manifest 数据表达）。
+    if (cfg.frameMs !== undefined) {
+      if (!Array.isArray(cfg.frameMs) || cfg.frameMs.length !== cfg.frames
+        || !cfg.frameMs.every((ms) => typeof ms === 'number' && Number.isFinite(ms) && ms > 0)) {
+        errors.push(`${label}.${name}: frameMs 必须是正数数组且长度 === frames（逐帧停留 ms；缺省回退 fps 节拍）`)
+      }
+    }
     // 播放模式（v5）：playback 枚举 + 帧数交叉校验（取代 loop 布尔——播放器按此推进帧）。
     if (!PLAYBACK_MODES.includes(cfg.playback)) {
       errors.push(`${label}.${name}: playback "${cfg.playback}" 不在 ${PLAYBACK_MODES.join('/')}`)

@@ -85,6 +85,10 @@
 
 帧序语义契约：**帧0 = 常态起点**（所有模式）——生图时第 1 帧画起点姿态，动作过程在后续帧。
 
+### 逐帧停留时长（frameMs，可选）
+
+每帧默认停留 `1000/fps` ms（统一节拍）。需非均匀节奏时声明 `frameMs`：**正数数组、长度 === frames**，`frameMs[i]` = 帧 i 的停留 ms（缺省回退 fps 节拍）——「首帧稍长、后续稍短」的缓动由数据表达（如 wake `frameMs: [1000, 200]`：帧0 停留 1000ms、帧1 停留 200ms），播放器不特判状态名。
+
 ### 朝向（flip）与素材朝向规范
 
 **素材统一朝左基准**（角色契约，全角色适用）：所有状态素材的人物默认朝左（flip=1 显示朝左、flip=-1 镜像显示朝右）。生图时人物一律朝左；代码 flip 以朝左为基准（walk 向右走 flip=-1、向左走 flip=1；drag 向左拖 flip=1、向右拖 flip=-1；静态态随机转身 flip 翻转）。**代码不得依赖具体角色的朝向**——素材契约保证 flip=1 恒为朝左，第二个角色同样遵守即零代码改动。
@@ -132,7 +136,7 @@
         "drag":         { "sheet": "drag.png",         "frames": 1, "fps": 5,  "playback": "loop",  "motion": "tilt" },
         "walk":         { "sheet": "walk.png",         "frames": 3, "fps": 6,  "playback": "pingpong" },
         "sleep":        { "sheet": "sleep.png",        "frames": 2, "fps": 1,  "playback": "loop" },
-        "wake":         { "sheet": "wake.png",         "frames": 2, "fps": 3,  "playback": "once" },
+        "wake":         { "sheet": "wake.png",         "frames": 2, "fps": 3,  "playback": "once", "frameMs": [1000, 200] },
         "welcome":      { "sheet": "welcome.png",      "frames": 2, "fps": 3,  "playback": "loop" },
         "think":        { "sheet": "think.png",        "frames": 1, "fps": 2,  "playback": "loop",  "motion": "float" },
         "wait":         { "sheet": "wait.png",         "frames": 1, "fps": 2,  "playback": "loop",  "motion": "wiggle" }
