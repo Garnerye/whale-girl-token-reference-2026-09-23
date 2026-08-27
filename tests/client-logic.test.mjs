@@ -299,21 +299,31 @@ test('nextFacingAt：随机转身间隔（区间边界用注入随机源）', ()
 
 // ---- v6 交互醒觉（sleep → drag → 放下立即回 sleep 的修复）----
 
-test('wakeFromInteraction：醒着交互 → 重置空闲、不播 wake', () => {
-  assert.deepEqual(wakeFromInteraction({ sleeping: false }), { sleeping: false, wake: false })
+test('wakeFromInteraction：视觉非 sleep 交互 → 重置空闲、不播 wake', () => {
+  // 视觉非 sleep（如会话活跃 → think）：即使空闲超时派生 sleeping=true，交互也不播 wake
+  assert.deepEqual(wakeFromInteraction({ visuallySleeping: false }), { sleeping: false, wake: false })
 })
 
-test('wakeFromInteraction：睡着交互 → 重置空闲、附加 wake 醒觉过渡', () => {
-  assert.deepEqual(wakeFromInteraction({ sleeping: true }), { sleeping: false, wake: true })
+test('wakeFromInteraction：视觉 sleep 动画中交互 → 重置空闲、附加 wake 醒觉过渡', () => {
+  assert.deepEqual(wakeFromInteraction({ visuallySleeping: true }), { sleeping: false, wake: true })
+})
+
+test('醒觉判定绑定视觉 sleep 动画：sleeping 派生变量不参与（回归：非 sleep 动画拖拽不播 wake）', () => {
+  // 契约：wake 判定输入是「交互开始时刻的视觉状态」（animState === 'sleep'），
+  // 不是 sleeping 派生变量——会话活跃时视觉已离开 sleep 但 sleeping 仍 true，不播 wake。
+  assert.equal(wakeFromInteraction({ visuallySleeping: false }).wake, false)
+  assert.equal(wakeFromInteraction({ visuallySleeping: true }).wake, true)
 })
 
 test('交互醒觉集成：sleep → drag → 放下（sleeping 归零）→ 缓冲过期后不回 sleep', () => {
-  // 放下瞬间：sleeping=true → wakeFromInteraction 归零 + 播 wake（宿主设 transient='wake'）
-  const afterRelease = wakeFromInteraction({ sleeping: true })
+  // 放下瞬间：视觉 sleep（交互开始时刻 animState==='sleep'）→ wakeFromInteraction 归零 + 播 wake
+  const afterRelease = wakeFromInteraction({ visuallySleeping: true })
   assert.equal(afterRelease.sleeping, false)
   assert.equal(afterRelease.wake, true)
-  // 放下缓冲期内：短暂回 idle（wake 行在 idle 缓冲行之后）
-  assert.equal(pickState({ ...IDLE, dragReleaseUntil: 2500, now: 1000, sleeping: afterRelease.sleeping, transient: 'wake' }), 'idle')
+  // 放下缓冲期内：wake 让位缓冲——睡着被拖起直接播 wake（不先 idle 缓冲）
+  assert.equal(pickState({ ...IDLE, dragReleaseUntil: 2500, now: 1000, sleeping: afterRelease.sleeping, transient: 'wake' }), 'wake')
+  // 对照：醒着拖拽（无 wake transient）→ 缓冲期内仍回 idle
+  assert.equal(pickState({ ...IDLE, dragReleaseUntil: 2500, now: 1000, sleeping: false, transient: null }), 'idle')
   // 缓冲过期、wake 播完（宿主 resetTransient → transient=null）：sleeping 已归零 → 底层状态而非 sleep
   assert.equal(pickState({ ...IDLE, dragReleaseUntil: 2500, now: 3000, sleeping: afterRelease.sleeping, transient: null }), 'idle')
   assert.equal(pickState({ ...IDLE, dragReleaseUntil: 2500, now: 3000, sleeping: afterRelease.sleeping, transient: null, sessionThink: true }), 'think')
@@ -322,8 +332,8 @@ test('交互醒觉集成：sleep → drag → 放下（sleeping 归零）→ 缓
 })
 
 test('交互醒觉：feed/play 结束后同样不回 sleep（sleeping 已归零）', () => {
-  // 互动瞬间 sleeping=true → 归零；eat 播完 + joy 结束后进入底层状态而非 sleep
-  const afterRelease = wakeFromInteraction({ sleeping: true })
+  // 互动瞬间视觉 sleep → 归零；eat 播完 + joy 结束后进入底层状态而非 sleep
+  const afterRelease = wakeFromInteraction({ visuallySleeping: true })
   assert.equal(pickState({ ...IDLE, sleeping: afterRelease.sleeping, joyUntil: 1500 }), 'joy')
   assert.equal(pickState({ ...IDLE, sleeping: afterRelease.sleeping, joyUntil: 800 }), 'idle')
   // 对照：旧行为（sleeping 未归零）→ joy 结束后立即回 sleep

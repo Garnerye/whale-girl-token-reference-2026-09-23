@@ -57,7 +57,7 @@ const SNAP = `(() => {
 
 // ---- 场景：sleep → drag → 放下 → 清醒不回 sleep ----
 // 走真实时间（sleepAfterMs=60000 + 3s 轮询）；断言序列是 v6 交互醒觉的契约：
-// 放下后 1.5s 缓冲 idle → wake（3s）→ 底层状态，10s 内不得回到 sleep。
+// 放下后直接 wake（3s，睡着被拖起时放下缓冲让位 wake）→ 底层状态，10s 内不得回到 sleep。
 async function sleepDragWake({ call, log }) {
   await call('Runtime.evaluate', { expression: `(() => {
     const t = document.getElementById('deepseek-onboarding-title')
@@ -103,8 +103,7 @@ async function sleepDragWake({ call, log }) {
   }
   await waitFor('during-drag', (v) => v.sheet === 'drag')
   await call('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x - 250, y, button: 'left', clickCount: 1 })
-  // 放下后：1.5s idle 缓冲 → wake（3s）→ 底层状态，全程不得回 sleep。
-  await waitFor('release-idle-buffer', (v) => v.sheet === 'idle', 3000)
+  // 放下后：睡着被拖起直接 wake（3s，放下缓冲让位 wake）→ 底层状态，全程不得回 sleep。
   await waitFor('release-wake', (v) => v.sheet === 'wake', 4000)
   const t3 = await waitFor('release-settled', (v) => v.sheet !== 'wake' && v.sheet !== 'sleep', 5000)
   if (t3.sheet === 'sleep') throw new Error('放下后回到 sleep（空闲计时未重置）')

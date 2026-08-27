@@ -32,7 +32,7 @@
 | 事件源 | 触发信号 | 动作 | 角色能改吗 |
 |---|---|---|---|
 | 用户拖拽（pointermove>6px） | `dragging` | `drag` | ❌ 触发固定 |
-| 拖拽放下 | `dragReleaseUntil` | `idle`（1.5s 缓冲） | ❌ |
+| 拖拽放下 | `dragReleaseUntil` | `idle`（1.5s 缓冲；睡着被拖起时让位 `wake`） | ❌ |
 | 点击喂食/玩耍 | `transient='eat'/'play'` | `eat` / `play` | ❌ |
 | 睡醒过渡（视觉边沿 / 交互醒觉） | `transient='wake'` | `wake` | ❌ |
 | `tasks.onTaskDone`（completed） | Node burst `celebrate` | `celebrate` | ❌ |

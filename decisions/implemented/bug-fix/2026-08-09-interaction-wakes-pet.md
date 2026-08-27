@@ -9,7 +9,7 @@ Status: implemented
 ## Decision
 
 - **任何用户交互 = 用户在场信号**：拖拽放下、喂食、玩耍、打开菜单统一重置空闲计时（`sleeping = false`、`idleSince = 0`），空闲从交互时刻重新起算——交互后宠物保持清醒（直到再次空闲 ≥ sleepAfterMs），不再「放下即回 sleep」。
-- **交互瞬间若正睡着，附加 wake 醒觉过渡**（`transient = 'wake'` + `WAKE_MS`）：拖拽放下先回 1.5s idle 缓冲（STATE_TABLE 缓冲行优先）再播 wake（3s）——「被拖起来」的自然醒觉，之后进入底层状态。
+- **交互瞬间若宠物视觉上处于 sleep 动画，附加 wake 醒觉过渡**（`transient = 'wake'` + `WAKE_MS`）：拖拽放下直接播 wake（放下缓冲行让位 wake——被拖起来的醒觉过渡不先 idle 缓冲）——「被拖起来」的自然醒觉，之后进入底层状态。**醒觉判定绑定视觉 sleep 状态**（交互开始时刻 `animState === 'sleep'`，宿主在 pointerdown/keydown 捕获），**不用 `sleeping` 派生变量**——会话活跃时（think/working 优先于 sleep）视觉已离开 sleep 但 `sleeping` 仍 true（activity 还 idle），此时交互不播 wake（用户看到的不是睡着，同 wake-visual-edge-trigger 的教训）。
 - **决策纯函数化**：新增 `wakeFromInteraction({ sleeping }) → { sleeping: false, wake }`（logic.mjs，可单测）；index.mjs 的 `releaseInteraction()` 是薄执行（归零 + 条件设 wake）。
 - **删除 `lastActiveAt` 死代码**：其全部赋值无读取，且「防睡着」注释误导（`sleeping` 判定只用 `idleSince`）；防睡着语义由 `releaseInteraction` 承担。
 - **拖拽被系统打断**（pointercancel / lostpointercapture）：同样按「放下」收尾（idle 缓冲 + `releaseInteraction`），防打断后立即回 sleep；pointerup 用 `wasMoved` 快照判断菜单切换，`moved` 在收尾后归零（`releasePointerCapture` 会触发 lostpointercapture，防重复收尾）。
@@ -22,6 +22,6 @@ Status: implemented
 
 ## Consequences
 
-- `sleep → drag → 放下` 现在走 `idle 缓冲 → wake（3s）→ 底层状态`，不再立即回 sleep；feed/play 播完、菜单关闭后同理保持清醒。
+- `sleep → drag → 放下` 现在走 `wake（3s）→ 底层状态`，不再立即回 sleep；放下缓冲仅对非唤醒拖拽生效（醒着拖拽仍先 1.5s idle 缓冲）；feed/play 播完、菜单关闭后同理保持清醒。
 - 纯 client 层修复：重装 + 刷新即可生效，无需重启 web（不涉及 Node half）。
 - 测试面：新增 `wakeFromInteraction` 单测（醒着/睡着两条）+ 集成测试（放下缓冲过期后不回 sleep、feed/play 播完不回 sleep，含旧行为对照断言）。
