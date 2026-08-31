@@ -86,7 +86,9 @@ cd "$(npm root -g)/whale-girl-desktop/src-tauri" && cargo build --release  # 首
 
 ## 配置
 
-参数经宿主 settings 配置，`<dshHome>/settings.yaml` 的 `whale-girl:` section（或设置 UI）修改后**热生效免重启**：
+**设置 → 插件 → 鲸鱼娘**（面板卡片）：高频子集——网页端显示、尺寸、透明度、游走、睡眠等待，以及投喂/玩耍回话文案池（每行一条）。**保存即生效、免重启**。
+
+全量与高级项（如各窗口时长）仍在 `<dshHome>/settings.yaml` 的 `whale-girl:` section：
 
 ```yaml
 whale-girl:

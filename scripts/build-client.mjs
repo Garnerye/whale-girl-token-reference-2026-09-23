@@ -59,6 +59,7 @@ export function generate({ check = false, root = ROOT } = {}) {
       '--format=cjs',
       '--platform=browser',
       '--target=es2020',
+      '--external:react',
       `--outfile=${tmpOut}`,
     ],
     { cwd: root, encoding: 'utf8' },

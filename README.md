@@ -89,7 +89,9 @@ cd "$(npm root -g)/whale-girl-desktop/src-tauri" && cargo build --release  # fir
 
 ## Configuration
 
-Edit the `whale-girl:` section in `<dshHome>/settings.yaml` (or the settings UI); changes **apply live, no restart**:
+**Settings → Plugins → Whale Girl** (in-page card): the high-frequency subset — show on page, size, opacity, wandering, sleep delay, and the feed/play reply pools (one per line). Changes **save and apply live, no restart**.
+
+The full option list stays in the `whale-girl:` section of `<dshHome>/settings.yaml` (advanced/additional knobs like window durations):
 
 ```yaml
 whale-girl:
